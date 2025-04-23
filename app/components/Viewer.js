@@ -5,40 +5,26 @@ import { generateMonopoleTower } from "../TowerTypeService/MonopoleService";
 import { generateThreeLeggedTower } from "../TowerTypeService/ThreeLeggedTowerService";
 import { generateFourLeggedTower } from "../TowerTypeService/FourLeggedService";
 import { generateAxes } from "../components/axisservice";
-
-const Viewer = ({ towerData }) => {
+let scene, camera, renderer, controls;
+const Viewer = ({ towerData,mountData }) => {
   const mountRef = useRef(null);
 
   useEffect(() => {
-    const { towerType, width, height } = towerData || {}; 
+    viewerInit();
+  }, []);
 
-    const scene = new THREE.Scene();
-    const camera = new THREE.PerspectiveCamera(75, 450 / window.innerHeight, 0.1, 100);
-    camera.position.set(0, 20, 35);
-
-    const renderer = new THREE.WebGLRenderer({ antialias: true });
-    renderer.setSize(450, window.innerHeight);
-    renderer.shadowMap.enabled = true;
+  useEffect(() => {
+    const { towerType, width, height } = towerData || {};
 
     if (mountRef.current.firstChild) {
       mountRef.current.removeChild(mountRef.current.firstChild);
     }
     mountRef.current.appendChild(renderer.domElement);
-
-    //  Axes
-    scene.add(generateAxes());
-
-    //  Lighting
-    const light = new THREE.DirectionalLight(0xffffff, 1);
-    light.position.set(10, 20, 10);
-    scene.add(light);
-    scene.add(new THREE.AmbientLight(0xffffff, 0.5));
-
     let object = null;
 
     // If no tower data, just show axes
     if (towerData) {
-      const towerWidth = width ? parseFloat(width) : 12; 
+      const towerWidth = width ? parseFloat(width) : 12;
       const towerHeight = height ? parseFloat(height) : 20;
 
       if (towerType === "Monopole") {
@@ -53,19 +39,52 @@ const Viewer = ({ towerData }) => {
         scene.add(object);
       }
     }
+  }, [towerData]);
 
-    const controls = new OrbitControls(camera, renderer.domElement);
+  const viewerInit = () => {
+    if (scene)
+      while (scene.children.length > 0) {
+        scene.remove(scene.children[0]);
+      }
+    scene = null;
+    if (renderer) {
+      renderer.clear();
+      const cur = viewer.current;
+      const ren = renderers;
+      if (renderers) {
+        ren.domElement.remove();
+        //cur.removeChild(ren.domElement);
+      }
+      //cur.appendChild(renderer.domElement);
+    }
+    scene = new THREE.Scene();
+    camera = new THREE.PerspectiveCamera(
+      75,
+      450 / window.innerHeight,
+      0.1,
+      100
+    );
+    camera.position.set(0, 20, 35);
+
+    renderer = new THREE.WebGLRenderer({ antialias: true });
+    renderer.setSize(450, window.innerHeight);
+    renderer.shadowMap.enabled = true;
+    //  Axes
+    scene.add(generateAxes());
+
+    //  Lighting
+    const light = new THREE.DirectionalLight(0xffffff, 1);
+    light.position.set(10, 20, 10);
+    scene.add(light);
+    scene.add(new THREE.AmbientLight(0xffffff, 0.5));
+
+    controls = new OrbitControls(camera, renderer.domElement);
     controls.enableDamping = true;
     controls.dampingFactor = 0.05;
     controls.rotateSpeed = 0.7;
     controls.enableZoom = true;
     controls.enablePan = false;
 
-    const animate = () => {
-      requestAnimationFrame(animate);
-      controls.update();
-      renderer.render(scene, camera);
-    };
     animate();
 
     return () => {
@@ -73,8 +92,12 @@ const Viewer = ({ towerData }) => {
       renderer.dispose();
       scene.clear();
     };
-  }, [towerData]);
-
+  };
+  const animate = () => {
+    requestAnimationFrame(animate);
+    controls.update();
+    renderer.render(scene, camera);
+  };
   return <div ref={mountRef}></div>;
 };
 
