@@ -1,12 +1,12 @@
 import React, { useEffect, useRef } from "react";
 import * as THREE from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
-import { generateMonopoleTower } from "../TowerTypeService/MonopoleService";
-import { generateThreeLeggedTower } from "../TowerTypeService/ThreeLeggedTowerService";
-import { generateFourLeggedTower } from "../TowerTypeService/FourLeggedService";
+import { generateMonopoleTower } from "../services/MonopoleService";
+import { generateThreeLeggedTower } from "../services/ThreeLeggedTowerService";
+import { generateFourLeggedTower } from "../services/FourLeggedService";
 import { generateAxes } from "../components/axisservice";
 let scene, camera, renderer, controls;
-const Viewer = ({ towerData,mountData }) => {
+const Viewer = ({ towerData, mountData, mountMemberDetails }) => {
   const mountRef = useRef(null);
 
   useEffect(() => {
@@ -14,6 +14,7 @@ const Viewer = ({ towerData,mountData }) => {
   }, []);
 
   useEffect(() => {
+    console.log("Tower Data useEffect:", towerData);
     const { towerType, width, height } = towerData || {};
 
     if (mountRef.current.firstChild) {
@@ -40,6 +41,41 @@ const Viewer = ({ towerData,mountData }) => {
       }
     }
   }, [towerData]);
+  useEffect(() => {
+    console.log("Mount MembersDetails useEffect:", mountData);
+    console.log(mountRef.current);
+    if (mountMemberDetails) {
+      const { memberNodes, mountMembers } = mountMemberDetails;
+      mountMembers.forEach((member) => {
+        const startNode = memberNodes.find(
+          (node) => node.ID === member.StartNodeID
+        );
+        const endNode = memberNodes.find(
+          (node) => node.ID === member.EndNodeID
+        );
+        const point1 = new THREE.Vector3(startNode.X, startNode.Y, startNode.Z);
+        const point2 = new THREE.Vector3(endNode.X, endNode.Y, endNode.Z);
+        console.log("Point1:", point1);
+        console.log("Point2:", point2);
+        // Create geometry and add the two points
+        const geometry = new THREE.BufferGeometry().setFromPoints([
+          point1,
+          point2,
+        ]);
+        console.log("Geometry:", geometry);
+        // Create a basic line material
+        const material = new THREE.LineBasicMaterial({
+          color: 0xff0000,
+          linewidth: 5,
+        }); // red color
+
+        // Create the line
+        const line = new THREE.Line(geometry, material);
+        console.log("Line:", line);
+        scene.add(line);
+      });
+    }
+  }, [mountMemberDetails]);
 
   const viewerInit = () => {
     if (scene)

@@ -32,57 +32,51 @@ const TowerDetailForm = ({ onTowerSubmit, onMountSubmit }) => {
 
   const mountTypeFields = {
     Platform: [
-      "Subtype",
-      "No of Handrails",
-      "Handrail Spacing",
-      "Face Width",
-      "Height",
-      "Kicker",
-      "Mount Azimuth",
+      { field: "subType", label: "Sub Type" },
+      { field: "noofHandrails", label: "No of Handrails" },
+      { field: "handrailSpacing", label: "Handrail Spacing" },
+      { field: "faceWidth", label: "Face Width" },
+      { field: "height", label: "Height" },
+      { field: "kicker", label: "Kicker" },
+      { field: "mountAzimuth", label: "Mount Azimuth" },
     ],
     "Sector Mount": [
-      "Boom Type",
-      "No of Handrails",
-      "Handrail Spacing",
-      "Face Width",
-      "Height",
-      "Standoff",
-      "Mount Azimuth",
-      "Face A",
-      "Face B",
-      "Face C",
+      { field: "boomType", label: "Boom Type" },
+      { field: "noofHandrails", label: "No of Handrails" },
+      { field: "handrailSpacing", label: "Handrail Spacing" },
+      { field: "faceWidth", label: "Face Width" },
+      { field: "height", label: "Height" },
+      { field: "standoff", label: "Standoff" },
+      { field: "mountAzimuth", label: "Mount Azimuth" },
+      { field: "location", label: "Location" },
     ],
     "3 Sector": [
-      "Boom Type",
-      "No of Handrails",
-      "Handrail Spacing",
-      "Face Width",
-      "Height",
-      "Standoff",
-      "Mount Azimuth",
-      "Face A",
-      "Face B",
-      "Face C",
+      { field: "boomType", label: "Boom Type" },
+      { field: "noofHandrails", label: "No of Handrails" },
+      { field: "handrailSpacing", label: "Handrail Spacing" },
+      { field: "faceWidth", label: "Face Width" },
+      { field: "height", label: "Height" },
+      { field: "standoff", label: "Standoff" },
+      { field: "mountAzimuth", label: "Mount Azimuth" },
+      { field: "location", label: "Location" },
     ],
     TArm: [
-      "Handrail Spacing",
-      "Face Width",
-      "Standoff",
-      "Face Rotation",
-      "Mount Azimuth",
-      "Face A",
-      "Face B",
-      "Face C",
+      { field: "noofHandrails", label: "No of Handrails" },
+      { field: "handrailSpacing", label: "Handrail Spacing" },
+      { field: "faceWidth", label: "Face Width" },
+      { field: "standoff", label: "Standoff" },
+      { field: "faceRotation", label: "Face Rotation" },
+      { field: "mountAzimuth", label: "Mount Azimuth" },
+      { field: "location", label: "Location" },
     ],
     "3TArm": [
-      "Handrail Spacing",
-      "Face Width",
-      "Standoff",
-      "Face Rotation",
-      "Mount Azimuth",
-      "Face A",
-      "Face B",
-      "Face C",
+      { field: "noofHandrails", label: "No of Handrails" },
+      { field: "handrailSpacing", label: "Handrail Spacing" },
+      { field: "faceWidth", label: "Face Width" },
+      { field: "standoff", label: "Standoff" },
+      { field: "faceRotation", label: "Face Rotation" },
+      { field: "mountAzimuth", label: "Mount Azimuth" },
+      { field: "location", label: "Location" },
     ],
   };
 
@@ -113,6 +107,14 @@ const TowerDetailForm = ({ onTowerSubmit, onMountSubmit }) => {
   // Options for dynamic dropdowns
   const subtypeOptions = ["3 Sided", "4 Sided", "Circular"];
   const boomTypeOptions = ["V-Boom", "Standard"];
+  const locationOptions = [
+    "Leg A",
+    "Leg B",
+    "Leg C",
+    "Face A",
+    "Face B",
+    "Face C",
+  ];
 
   return (
     <div className="container min-vh-100 mt-4">
@@ -294,16 +296,19 @@ const TowerDetailForm = ({ onTowerSubmit, onMountSubmit }) => {
 
             {enabledFields.length > 0 && (
               <div className="row">
-                {enabledFields.map((field) => {
-                  if (field === "Subtype" && selectedMountType === "Platform") {
+                {enabledFields.map((fieldOption) => {
+                  if (
+                    fieldOption.field === "subType" &&
+                    selectedMountType === "Platform"
+                  ) {
                     return (
-                      <div key={field} className="col-md-3 mb-3">
-                        <label className="form-label fw-bold">Subtype</label>
+                      <div key={fieldOption.field} className="col-md-3 mb-3">
+                        <label className="form-label fw-bold">Sub Type</label>
                         <select
-                          {...registerMount("subtype")}
+                          {...registerMount(fieldOption.field)}
                           className="form-select"
                         >
-                          <option value="">Select Subtype</option>
+                          <option value="">Select Sub Type</option>
                           {subtypeOptions.map((option) => (
                             <option key={option} value={option}>
                               {option}
@@ -315,14 +320,14 @@ const TowerDetailForm = ({ onTowerSubmit, onMountSubmit }) => {
                   }
 
                   if (
-                    field === "Boom Type" &&
+                    fieldOption.field === "boomType" &&
                     selectedMountType === "Sector Mount"
                   ) {
                     return (
-                      <div key={field} className="col-md-3 mb-3">
+                      <div key={fieldOption.field} className="col-md-3 mb-3">
                         <label className="form-label fw-bold">Boom Type</label>
                         <select
-                          {...registerMount("boomType")}
+                          {...registerMount(fieldOption.field)}
                           className="form-select"
                         >
                           <option value="">Select Boom Type</option>
@@ -335,13 +340,33 @@ const TowerDetailForm = ({ onTowerSubmit, onMountSubmit }) => {
                       </div>
                     );
                   }
+                  if (fieldOption.field === "location") {
+                    return (
+                      <div key={fieldOption.field} className="col-md-3 mb-3">
+                        <label className="form-label fw-bold">Location</label>
+                        <select
+                          {...registerMount(fieldOption.field)}
+                          className="form-select"
+                        >
+                          <option value="">Select Location</option>
+                          {locationOptions.map((option) => (
+                            <option key={option} value={option}>
+                              {option}
+                            </option>
+                          ))}
+                        </select>
+                      </div>
+                    );
+                  }
 
                   return (
-                    <div key={field} className="col-md-3 mb-3">
-                      <label className="form-label fw-bold">{field}</label>
+                    <div key={fieldOption.field} className="col-md-3 mb-3">
+                      <label className="form-label fw-bold">
+                        {fieldOption.label}
+                      </label>
                       <input
                         type="text"
-                        {...registerMount(field)}
+                        {...registerMount(fieldOption.field)}
                         className="form-control"
                       />
                     </div>
